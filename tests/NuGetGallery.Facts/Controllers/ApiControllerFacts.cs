@@ -14,6 +14,7 @@ using System.Web.Routing;
 using Moq;
 using Newtonsoft.Json.Linq;
 using NuGet;
+using NuGet.Versioning;
 using NuGetGallery.Framework;
 using NuGetGallery.Packaging;
 using Xunit;
@@ -87,7 +88,7 @@ namespace NuGetGallery
 
                 var nuGetPackage = new Mock<INupkg>();
                 nuGetPackage.Setup(x => x.Metadata.Id).Returns("theId");
-                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new SemanticVersion("1.0.42"));
+                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new NuGetVersion("1.0.42"));
                 controller.SetupPackageFromInputStream(nuGetPackage);
 
                 // Act
@@ -100,7 +101,7 @@ namespace NuGetGallery
             [Fact]
             public async Task WillReturnConflictIfAPackageWithTheIdAndSameNormalizedVersionAlreadyExists()
             {
-                var version = new SemanticVersion("1.0.042");
+                var version = new NuGetVersion("1.0.042");
                 var nuGetPackage = new Mock<INupkg>();
                 nuGetPackage.Setup(x => x.Metadata.Id).Returns("theId");
                 nuGetPackage.Setup(x => x.Metadata.Version).Returns(version);
@@ -133,7 +134,7 @@ namespace NuGetGallery
             {
                 var nuGetPackage = new Mock<INupkg>();
                 nuGetPackage.Setup(x => x.Metadata.Id).Returns("theId");
-                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new SemanticVersion("1.0.42"));
+                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new NuGetVersion("1.0.42"));
                 var user = new User() { EmailAddress = "confirmed@email.com" }; 
                 var controller = new TestableApiController();
                 var apiKey = Guid.NewGuid();
@@ -151,7 +152,7 @@ namespace NuGetGallery
             {
                 var nuGetPackage = new Mock<INupkg>();
                 nuGetPackage.Setup(x => x.Metadata.Id).Returns("theId");
-                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new SemanticVersion("1.0.42"));
+                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new NuGetVersion("1.0.42"));
                 var user = new User() { EmailAddress = "confirmed@email.com" };
                 var controller = new TestableApiController();
                 var apiKey = Guid.NewGuid();
@@ -169,7 +170,7 @@ namespace NuGetGallery
             {
                 var nuGetPackage = new Mock<INupkg>();
                 nuGetPackage.Setup(x => x.Metadata.Id).Returns("theId");
-                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new SemanticVersion("1.0.42"));
+                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new NuGetVersion("1.0.42"));
                 var user = new User() { EmailAddress = "confirmed@email.com" };
                 var controller = new TestableApiController();
                 var apiKey = Guid.NewGuid();
@@ -187,7 +188,7 @@ namespace NuGetGallery
             {
                 var nuGetPackage = new Mock<INupkg>();
                 nuGetPackage.Setup(x => x.Metadata.Id).Returns("theId");
-                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new SemanticVersion("1.0.42"));
+                nuGetPackage.Setup(x => x.Metadata.Version).Returns(new NuGetVersion("1.0.42"));
                 var user = new User() { EmailAddress = "confirmed@email.com" }; 
                 var controller = new TestableApiController();
                 var apiKey = Guid.NewGuid();
@@ -204,7 +205,7 @@ namespace NuGetGallery
         public class TheDeletePackageAction
         {
             [Fact]
-            public void WillThrowIfAPackageWithTheIdAndSemanticVersionDoesNotExist()
+            public void WillThrowIfAPackageWithTheIdAndNuGetVersionDoesNotExist()
             {
                 var controller = new TestableApiController();
                 controller.MockPackageService.Setup(x => x.FindPackageByIdAndVersion("theId", "1.0.42", true)).Returns((Package)null);
@@ -458,7 +459,7 @@ namespace NuGetGallery
         public class ThePublishPackageAction
         {
             [Fact]
-            public void WillThrowIfAPackageWithTheIdAndSemanticVersionDoesNotExist()
+            public void WillThrowIfAPackageWithTheIdAndNuGetVersionDoesNotExist()
             {
                 // Arrange
                 var controller = new TestableApiController();

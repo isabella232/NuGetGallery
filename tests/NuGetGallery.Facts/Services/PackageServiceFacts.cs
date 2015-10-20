@@ -8,6 +8,8 @@ using System.Linq;
 using System.Runtime.Versioning;
 using Moq;
 using NuGet;
+using NuGet.Packaging;
+using NuGet.Versioning;
 using NuGetGallery.Framework;
 using NuGetGallery.Packaging;
 using Xunit;
@@ -16,14 +18,14 @@ namespace NuGetGallery
 {
     public class PackageServiceFacts
     {
-        private static Mock<INupkg> CreateNuGetPackage(Action<Mock<IPackageMetadata>> setupMetadata = null)
+        private static Mock<PackageReader> CreateNuGetPackage(Action<Mock<IPackageMetadata>> setupMetadata = null)
         {
             var nugetPackage = new Mock<INupkg>();
             var metadata = new Mock<IPackageMetadata>();
             nugetPackage.Setup(x => x.Metadata).Returns(metadata.Object);
 
             metadata.Setup(x => x.Id).Returns("theId");
-            metadata.Setup(x => x.Version).Returns(new SemanticVersion("01.0.42.0"));
+            metadata.Setup(x => x.Version).Returns(new NuGetVersion("01.0.42.0"));
 
             metadata.Setup(x => x.Authors).Returns(new[] { "theFirstAuthor", "theSecondAuthor" });
             metadata.Setup(x => x.DependencySets).Returns(
@@ -37,19 +39,19 @@ namespace NuGetGallery
                                         "theFirstDependency",
                                         new VersionSpec
                                             {
-                                                MinVersion = new SemanticVersion("1.0"),
-                                                MaxVersion = new SemanticVersion("2.0"),
+                                                MinVersion = new NuGetVersion("1.0"),
+                                                MaxVersion = new NuGetVersion("2.0"),
                                                 IsMinInclusive = true,
                                                 IsMaxInclusive = false
                                             }),
-                                    new NuGet.PackageDependency("theSecondDependency", new VersionSpec(new SemanticVersion("1.0"))),
+                                    new NuGet.PackageDependency("theSecondDependency", new VersionSpec(new NuGetVersion("1.0"))),
                                     new NuGet.PackageDependency("theThirdDependency")
                                 }),
                         new PackageDependencySet(
                             VersionUtility.ParseFrameworkName("net35"),
                             new[]
                                 {
-                                    new NuGet.PackageDependency("theFourthDependency", new VersionSpec(new SemanticVersion("1.0")))
+                                    new NuGet.PackageDependency("theFourthDependency", new VersionSpec(new NuGetVersion("1.0")))
                                 })
                     });
             metadata.Setup(x => x.Description).Returns("theDescription");
@@ -398,7 +400,7 @@ namespace NuGetGallery
                 packageRegistrationRepository.Setup(r => r.CommitChanges()).Verifiable();
                 var service = CreateService(packageRegistrationRepository: packageRegistrationRepository, setup:
                         mockPackageService => { mockPackageService.Setup(x => x.FindPackageRegistrationById(It.IsAny<string>())).Returns((PackageRegistration)null); });
-                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new SemanticVersion("2.14.0-a")));
+                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new NuGetVersion("2.14.0-a")));
                 var currentUser = new User();
 
                 // Act
@@ -417,7 +419,7 @@ namespace NuGetGallery
                 packageRegistrationRepository.Setup(r => r.InsertOnCommit(It.IsAny<PackageRegistration>())).Returns(1).Verifiable();
                 var service = CreateService(packageRegistrationRepository: packageRegistrationRepository, setup:
                         mockPackageService => { mockPackageService.Setup(x => x.FindPackageRegistrationById(It.IsAny<string>())).Returns((PackageRegistration)null); });
-                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new SemanticVersion("2.14.0-a")));
+                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new NuGetVersion("2.14.0-a")));
                 var currentUser = new User();
 
                 // Act
@@ -437,7 +439,7 @@ namespace NuGetGallery
                 var service = CreateService(indexingService: indexingService, packageRegistrationRepository: packageRegistrationRepository, setup:
                         mockPackageService => { mockPackageService.Setup(x => x.FindPackageRegistrationById(It.IsAny<string>())).Returns((PackageRegistration)null); });
 
-                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new SemanticVersion("2.14.0-a")));
+                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new NuGetVersion("2.14.0-a")));
                 var currentUser = new User();
 
                 // Act
@@ -455,7 +457,7 @@ namespace NuGetGallery
                 indexingService.Setup(s => s.UpdateIndex()).Verifiable();
                 var service = CreateService(indexingService: indexingService, packageRegistrationRepository: packageRegistrationRepository, setup:
                         mockPackageService => { mockPackageService.Setup(x => x.FindPackageRegistrationById(It.IsAny<string>())).Returns((PackageRegistration)null); });
-                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new SemanticVersion("2.14.0-a")));
+                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new NuGetVersion("2.14.0-a")));
                 var currentUser = new User();
 
                 // Act
@@ -474,7 +476,7 @@ namespace NuGetGallery
                 packageRegistrationRepository.Setup(r => r.CommitChanges()).Verifiable();
                 var service = CreateService(packageRegistrationRepository: packageRegistrationRepository, setup:
                         mockPackageService => { mockPackageService.Setup(x => x.FindPackageRegistrationById(It.IsAny<string>())).Returns((PackageRegistration)null); });
-                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new SemanticVersion("2.14.0-a")));
+                var nugetPackage = CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(new NuGetVersion("2.14.0-a")));
                 var currentUser = new User();
 
                 // Act
@@ -640,7 +642,7 @@ namespace NuGetGallery
                 var service = CreateService();
                 var versionString = "1.0.0-".PadRight(65, 'a');
                 var nugetPackage =
-                    CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(SemanticVersion.Parse(versionString)));
+                    CreateNuGetPackage(m => m.Setup(x => x.Version).Returns(NuGetVersion.Parse(versionString)));
 
                 var ex = Assert.Throws<EntityException>(() => service.CreatePackage(nugetPackage.Object, null));
 
@@ -682,8 +684,8 @@ namespace NuGetGallery
                             "theFirstDependency".PadRight(129, '_'),
                             new VersionSpec
                             {
-                                MinVersion = new SemanticVersion("1.0"),
-                                MaxVersion = new SemanticVersion("2.0"),
+                                MinVersion = new NuGetVersion("1.0"),
+                                MaxVersion = new NuGetVersion("2.0"),
                                 IsMinInclusive = true,
                                 IsMaxInclusive = false
                             })
@@ -711,8 +713,8 @@ namespace NuGetGallery
                             "theFirstDependency",
                             new VersionSpec
                             {
-                                MinVersion = new SemanticVersion("1.0-".PadRight(257, 'a')),
-                                MaxVersion = new SemanticVersion("2.0"),
+                                MinVersion = new NuGetVersion("1.0-".PadRight(257, 'a')),
+                                MaxVersion = new NuGetVersion("2.0"),
                                 IsMinInclusive = true,
                                 IsMaxInclusive = false
                             })

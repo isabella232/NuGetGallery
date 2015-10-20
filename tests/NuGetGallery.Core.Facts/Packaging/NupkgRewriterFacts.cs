@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Moq;
 using NuGet;
+using NuGet.Versioning;
 using NuGetGallery.Packaging;
 using Xunit;
 
@@ -29,7 +30,7 @@ namespace NuGetGallery.Packaging
             using (var nupkg = new Nupkg(packageStream, leaveOpen: false))
             {
                 Assert.Equal("TestPackage", nupkg.Metadata.Id);
-                Assert.Equal(SemanticVersion.Parse("0.0.0.1"), nupkg.Metadata.Version);
+                Assert.Equal(NuGetVersion.Parse("0.0.0.1"), nupkg.Metadata.Version);
                 Assert.Equal("Me and You", string.Join(" ", nupkg.Metadata.Authors));
                 Assert.Equal("Peas In A Pod", nupkg.Metadata.Tags);
             }
@@ -41,7 +42,7 @@ namespace NuGetGallery.Packaging
             var builder = new PackageBuilder
             {
                 Id = "TestPackage",
-                Version = SemanticVersion.Parse("0.0.0.1"),
+                Version = NuGetVersion.Parse("0.0.0.1"),
                 Description = "Trivial Description",
                 Authors = { "AuthorsIsRequiredSayWhaat?" },
             };

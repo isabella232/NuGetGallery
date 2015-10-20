@@ -12,6 +12,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Moq;
 using NuGet;
+using NuGet.Versioning;
 using NuGetGallery.AsyncFileUpload;
 using NuGetGallery.Configuration;
 using NuGetGallery.Framework;
@@ -1038,7 +1039,7 @@ namespace NuGetGallery
                 var fakeUploadFileStream = new MemoryStream();
                 fakeUploadFileService.Setup(x => x.GetUploadFileAsync(TestUtility.FakeUser.Key)).Returns(Task.FromResult<Stream>(fakeUploadFileStream));
                 var fakeNuGetPackage = new Mock<INupkg>();
-                fakeNuGetPackage.Setup(x => x.Metadata.Version).Returns(new SemanticVersion("1.0.42"));
+                fakeNuGetPackage.Setup(x => x.Metadata.Version).Returns(new NuGetVersion("1.0.42"));
                 var controller = CreateController(
                     uploadFileService: fakeUploadFileService,
                     fakeNuGetPackage: fakeNuGetPackage);
